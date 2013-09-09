@@ -10,7 +10,7 @@ var cube       = require("../"),
 
 var options = require("../config/cube").include('evaluator'),
     mongodb = require("mongodb"),
-    mongo   = new mongodb.Server(options["mongo-host"], options["mongo-port"], options["mongo-server_options"]),
+    mongo   = new mongodb.Server(options["mongo-host"], options["mongo-port"], options["mongo-server-options"]),
     db      = new mongodb.Db(options["mongo-database"], mongo, { native_parser: true }),
     putter, getter;
 
