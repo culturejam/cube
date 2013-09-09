@@ -58,7 +58,7 @@ suite.addBatch(
         assert.equal(response.statusCode, 200);
       },
       "the expected headers should be set": function(response) {
-        assert.equal(response.headers["content-type"], "text/javascript");
+        assert.equal(response.headers["content-type"], "application/javascript");
         assert.equal(response.headers["content-length"], 1);
         assert.ok(new Date(response.headers["date"]) > Date.UTC(2011, 0, 1));
         assert.ok(new Date(response.headers["last-modified"]) > Date.UTC(2011, 0, 1));
@@ -75,7 +75,7 @@ suite.addBatch(
       "the expected headers should be set": function(response) {
         assert.ok(!("Content-Length" in response.headers));
         assert.ok(new Date(response.headers["date"]) > Date.UTC(2011, 0, 1));
-        assert.ok(new Date(response.headers["last-modified"]) > Date.UTC(2011, 0, 1));
+        assert.ok(!("last-modified" in response.headers));
       },
       "no content should be returned": function(response) {
         assert.equal(response.body, "");
@@ -87,7 +87,7 @@ suite.addBatch(
         assert.equal(response.statusCode, 200);
       },
       "the expected headers should be set": function(response) {
-        assert.equal(response.headers["content-type"], "text/javascript");
+        assert.equal(response.headers["content-type"], "application/javascript");
         assert.ok(!("Content-Length" in response.headers));
         assert.ok(new Date(response.headers["date"]) > Date.UTC(2011, 0, 1));
         assert.ok(new Date(response.headers["last-modified"]) > Date.UTC(2011, 0, 1));
