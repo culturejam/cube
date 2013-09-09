@@ -11,4 +11,4 @@ all: \
 	lib/cube/metric-expression.js
 
 test: all
-	@$(JS_TESTER)
+	NODE_ENV=test $(JS_TESTER) --isolate --spec
