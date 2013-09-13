@@ -8,11 +8,22 @@ var cube       = require("../"),
     event_mod  = require("../lib/cube/event"),
     models     = require("../lib/cube/models"), Event = models.Event;
 
-var options = require("../config/cube").include('evaluator'),
-    mongodb = require("mongodb"),
-    mongo   = new mongodb.Server(options["mongo-host"], options["mongo-port"], options["mongo-server-options"]),
-    db      = new mongodb.Db(options["mongo-database"], mongo, { native_parser: true }),
-    putter, getter;
+var options = {
+    'mongo-host': '127.0.0.1',
+    'mongo-port': 27017,
+    'mongo-server-options': {
+      auto_reconnect: true,
+      poolSize: 8,
+      socketOptions: {
+        noDelay: true
+      }
+    },
+    'mongo-database': 'cube'
+  },
+  mongodb = require("mongodb"),
+  mongo   = new mongodb.Server(options["mongo-host"], options["mongo-port"], options["mongo-server-options"]),
+  db      = new mongodb.Db(options["mongo-database"], mongo, { native_parser: true }),
+  putter, getter;
 
 var type = 'doh';
 

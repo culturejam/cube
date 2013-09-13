@@ -5,7 +5,7 @@ var _           = require('underscore'),
     assert      = require("assert"),
     test_helper = require("./test_helper"),
     event       = require("../lib/cube/event"),
-    config      = require("../config/cube"),
+    config      = require("../lib/cube/config"),
     warmer      = require("../lib/cube/warmer");
 
 var suite = vows.describe("warmer");
@@ -13,17 +13,15 @@ var suite = vows.describe("warmer");
 suite.addBatch(test_helper.batch({
   topic: function(test_db) {
     // Temporarily override horizons settings
-    this.oldHorizons = config.get('horizons');
-    config.set('horizons', {
-      calculation: 30000
-    });
+    this.oldHorizons = config.horizons;
+    config.horizons = { calculation: 30000 };
 
     var board  = { pieces: [{ query: "sum(test(value))" }] },
         nowish = this.nowish = (10e3 * Math.floor(new Date()/10e3)),
         putter = this.putter = event.putter(test_db),
         _this  = this;
 
-    this.warmer = warmer();
+    this.warmer = warmer(config);
 
     putter({type: 'test', time: nowish + 500, data: {value: 10}}, function(){
       putter({type: 'test', time: nowish + 2000, data: {value: 5}}, function(){
@@ -53,7 +51,7 @@ suite.addBatch(test_helper.batch({
     }
   },
   teardown: function(){
-    config.set('horizons', this.oldHorizons);
+    config.horizons = this.oldHorizons;
     this.warmer.stop();
     this.putter.stop(this.callback);
   }

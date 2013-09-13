@@ -1,7 +1,7 @@
 'use strict';
 
 var cube = require("../"),
-    server = cube.server('evaluator');
+    server = cube.server(require('./evaluator-config'));
 
 server
   .use(cube.evaluator.register)

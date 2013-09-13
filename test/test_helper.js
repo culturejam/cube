@@ -7,7 +7,7 @@ var _ = require("underscore"),
     dgram       = require('dgram'),
     Db          = require("../lib/cube/db"),
     metalog     = require("../lib/cube/metalog"),
-    config      = require("../config/cube");
+    config      = require("../lib/cube/config");
 
 // ==========================================================================
 //
@@ -19,38 +19,38 @@ var test_collections   = ["test_users", "test_events", "test_metrics", "test_boa
 test_helper.inspectify = metalog.inspectify;
 test_helper._          = require('underscore');
 
-config.set('mongodb', {
-  'mongo-host': 'localhost',
-  'mongo-port': 27017,
-  'mongo-username': null,
-  'mongo-password': null,
-  'mongo-database': 'cube_test',
-  'host': 'localhost',
-  'authentication-collection': 'test_users'
-});
-
-config.set('horizons', {
-  calculation: +(new Date()),
-  invalidation: +(new Date())
+config.load({
+  mongodb: {
+    'mongo-host': 'localhost',
+    'mongo-port': 27017,
+    'mongo-username': null,
+    'mongo-password': null,
+    'mongo-database': 'cube_test',
+    'host': 'localhost',
+    'authentication-collection': 'test_users'
+  },
+  horizons: {
+    calculation: +(new Date()),
+    invalidation: +(new Date())
+  },
+  warmer: {
+    'warmer-interval': 10000,
+    'warmer-tier': 10000
+  }
 });
 
 var basePort = 1083;
-config.set('collector', {
-  'http-port': basePort++,
-  'udp-port': basePort++,
-  'authenticator': 'allow_all'
-});
-
-config.set('evaluator', {
-  'http-port': basePort++,
-  'authenticator': 'allow_all'
-});
-
-config.set('warmer', {
-  'warmer-interval': 10000,
-  'warmer-tier': 10000
-});
-
+var kinds = {
+  collector: {
+    'http-port': basePort++,
+    'udp-port': basePort++,
+    'authenticator': 'allow_all'
+  },
+  evaluator: {
+    'http-port': basePort++,
+    'authenticator': 'allow_all'
+  }
+};
 
 // Disable logging for tests.
 metalog.loggers.info  = metalog.silent; // log
@@ -151,7 +151,7 @@ test_helper.delay = delay;
 test_helper.with_server = function(kind, components, batch){
   return test_helper.batch({ '': {
     topic:    function(test_db){
-      var ctxt = this, cb = ctxt.callback;
+      var ctxt = this;
       start_server(kind, components, ctxt, test_db);
     },
     '':       batch,
@@ -167,10 +167,10 @@ test_helper.with_server = function(kind, components, batch){
 
 // @see test_helper.with_server
 function start_server(kind, register, ctxt, test_db){
-  var config = require('../config/cube').get(kind);
+  var config = require('../lib/cube/config').load(kinds[kind]);
   ctxt.http_port = config['http-port'];
   ctxt.udp_port  = config['udp-port'];
-  ctxt.server = require('../lib/cube/server')(kind, test_db);
+  ctxt.server = require('../lib/cube/server')(config, test_db);
   ctxt.server.use(register);
   ctxt.server.start(ctxt.callback);
 }
